@@ -42,8 +42,14 @@ class BallViewModel : ViewModel() {
                 val dT = (event.timestamp - lastTimestamp) * NS2S
 
                 // Update the ball's position and velocity
-                // The sensor's y-axis is inverted (sensor +y is up, screen +y is down)
-                currentBall.updatePositionAndVelocity(xAcc = event.values[0], yAcc = -event.values[1], dT = dT)
+                // The sensor returns the opposite of gravitational acceleration
+                // Scale factor to make the ball movement more responsive
+                val scale = 50.0f  // Adjust this value to control ball sensitivity
+                currentBall.updatePositionAndVelocity(
+                    xAcc = -event.values[0] * scale,
+                    yAcc = event.values[1] * scale,
+                    dT = dT
+                )
 
                 // Update the StateFlow to notify the UI
                 _ballPosition.update { Offset(currentBall.posX, currentBall.posY) }
